@@ -1,0 +1,25 @@
+{
+    "name": "sixty-nine/dev-tools",
+    "description": "Developer Tools",
+    "require": {
+        "symfony/console": "^3.3",
+        "gossi/php-code-generator": "^0.5.0",
+        "symfony/process": "^3.3",
+        "phpunit/phpunit": "^6.4",
+        "league/flysystem": "^1.0",
+        "league/flysystem-ziparchive": "^1.0",
+        "guzzlehttp/guzzle": "~6.0"
+    },
+    "authors": [
+        {
+            "name": "Daniele Barsotti",
+            "email": "sixtynine.db@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "SixtyNine\\DevTools": "src"
+        }
+    }
+
+}
