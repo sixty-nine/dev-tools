@@ -12,6 +12,8 @@ class Project
     protected $files = [];
     /** @var array */
     protected $writableDirs = [];
+    /** @var array */
+    protected $gitCheckouts = [];
 
     /**
      * @param string $name
@@ -72,6 +74,12 @@ class Project
         return $this;
     }
 
+    public function gitCheckout($path, $url)
+    {
+        $this->gitCheckouts[$path] = $url;
+        return $this;
+    }
+
     /** @return string */
     public function getBasePath()
     {
@@ -94,6 +102,12 @@ class Project
     public function getWritableDirectories()
     {
         return $this->writableDirs;
+    }
+
+    /** @return array */
+    public function getGitCheckouts()
+    {
+        return $this->gitCheckouts;
     }
 
     /**

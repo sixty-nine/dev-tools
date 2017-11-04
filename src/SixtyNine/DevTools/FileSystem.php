@@ -6,6 +6,7 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\FilesystemInterface;
 use SixtyNine\DevTools\Model\File;
 use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Process\Process;
 
 class FileSystem
 {
@@ -80,7 +81,60 @@ class FileSystem
                     $this->makeWritable($file['path'], true);
                 }
             }
-            @$this->fs->setVisibility($path, 'writable');
+            try {
+                $this->fs->setVisibility($path, 'writable');
+            } catch (\LogicException $ex) {
+                // The filesystem does not support visibility, do nothing...
+            }
         }
+    }
+
+    public function gitCheckout($path, $url)
+    {
+        $cmd = sprintf('git clone %s', $url);
+        $this->runProcess($path, $cmd);
+
+//        $gitDir = str_replace('.git', '', basename($url));
+//        $gitDir = sprintf('%s/%s', $path, $gitDir);
+//        $composerJson = sprintf('%s/composer.json', $gitDir);
+//        // TODO: does not work. The flysystem path does not match the real filesystem path
+//        // TODO: introduce the notion of base path in this class (move the flysystem adapter here)
+//        var_dump($composerJson);
+//        if ($this->fs->has($composerJson)) {
+//            var_dump('yes');
+//            $this->composerInstall($gitDir);
+//        }
+    }
+
+    public function composerInstall($path)
+    {
+        $this->runProcess($path, 'composer install');
+    }
+
+    protected function runProcess($path, $cmd)
+    {
+        $this->output->writeln(sprintf('Running <info>%s</info> in <info>%s</info>', $cmd, $path));
+
+        if ($this->dryRun) {
+            return;
+        }
+
+        $process = new Process($cmd, $path);
+        $process->start();
+
+        foreach ($process as $data) {
+            $this->output->writeln(sprintf('<comment>%s</comment>', $this->normalizeOutput($data)));
+        }
+
+        if ($process->isSuccessful()) {
+            $this->output->writeln('<info>Done</info>');
+        } else {
+            $this->output->writeln('<error>Failed</error>');
+        }
+    }
+
+    protected function normalizeOutput($output)
+    {
+        return substr($output, -1) === PHP_EOL ? substr($output, 0, -1) : $output;
     }
 }

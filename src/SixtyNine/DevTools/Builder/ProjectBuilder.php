@@ -35,5 +35,9 @@ class ProjectBuilder
         foreach ($this->project->getWritableDirectories() as $directory) {
             $this->filesystem->makeWritable($directory);
         }
+
+        foreach ($this->project->getGitCheckouts() as $path => $url) {
+            $this->filesystem->gitCheckout($path, $url);
+        }
     }
 }

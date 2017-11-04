@@ -37,10 +37,12 @@ class GenerateProjectCommand extends Command
             ->createFile('hello.txt', 'Hello world')
             ->createFile('doc/hello.txt', 'Hello world')
             ->createFile('/etc/apache/site-available', $builder->build(), true)
+            ->createDirectory('/dev-tools')
             ->createDirectory('/cache')
             ->createFile('/cache/writable', 'yoooo', true)
             ->createFile('/cache/test/writable', 'yoooo', true)
             ->makeWritable('/cache')
+            ->gitCheckout($basePath, 'git@github.com:sixty-nine/dev-tools.git')
         ;
 
         $adapter = new Local(
