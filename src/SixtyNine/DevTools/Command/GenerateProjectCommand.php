@@ -2,12 +2,11 @@
 
 namespace SixtyNine\DevTools\Command;
 
-use League\Flysystem\Filesystem as BaseFileSystem;
 use League\Flysystem\Adapter\Local;
-use SixtyNine\DevTools\Builder\ProjectBuilder;
 use SixtyNine\DevTools\Builder\VirtualHostBuilder;
-use SixtyNine\DevTools\FileSystem;
-use SixtyNine\DevTools\Model\Project;
+use SixtyNine\DevTools\Builder;
+use SixtyNine\DevTools\Model\File;
+use SixtyNine\DevTools\Model\Path;
 use SixtyNine\DevTools\Model\VirtualHost;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -30,20 +29,7 @@ class GenerateProjectCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $basePath = realpath(__DIR__ . '/../../../../../files');
-        $builder = new VirtualHostBuilder(new VirtualHost('test.lo', $basePath));
-
-        $project = new Project('Hello world', '/home/dev/hello');
-        $project
-            ->createFile('hello.txt', 'Hello world')
-            ->createFile('doc/hello.txt', 'Hello world')
-            ->createFile('/etc/apache/site-available', $builder->build(), true)
-            ->createDirectory('/dev-tools')
-            ->createDirectory('/cache')
-            ->createFile('/cache/writable', 'yoooo', true)
-            ->createFile('/cache/test/writable', 'yoooo', true)
-            ->makeWritable('/cache')
-            ->gitCheckout($basePath, 'git@github.com:sixty-nine/dev-tools.git')
-        ;
+        $hostBuilder = new VirtualHostBuilder(new VirtualHost('test.lo', $basePath));
 
         $adapter = new Local(
             $basePath,
@@ -59,9 +45,18 @@ class GenerateProjectCommand extends Command
             ]
         );
 //        $adapter = new Local('/');
-        $baseFilesystem = new BaseFileSystem($adapter);
-        $filesystem = new FileSystem($baseFilesystem, $output, !$input->getOption('force'));
-        $builder = new ProjectBuilder($project, $filesystem);
-        $builder->build();
+        $builder = new Builder($basePath, $adapter, $output, !$input->getOption('force'));
+        $builder
+            ->createFile(File::create('hello.txt', 'Hello world'))
+            ->createFile(File::create('doc/hello.txt', 'Hello world'))
+            ->createFile(File::create('/etc/apache/site-available', $hostBuilder->build(), true))
+            ->createDirectory(Path::parse('/dev-tools'))
+            ->createDirectory(Path::parse('/cache'))
+            ->createFile(File::create('/cache/writable', 'yoooo', true))
+            ->createFile(File::create('/cache/test/writable', 'yoooo', true))
+            ->makeWritable(Path::parse('/cache'))
+            ->gitCheckout(Path::parse('/'), 'git@github.com:sixty-nine/dev-tools.git')
+        ;
+
     }
 }

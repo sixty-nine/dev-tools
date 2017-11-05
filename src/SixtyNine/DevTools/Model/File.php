@@ -4,18 +4,27 @@ namespace SixtyNine\DevTools\Model;
 
 class File
 {
-    /** @var string */
-    protected $name;
+    /** @var Path */
+    protected $path;
     /** @var string */
     protected $content;
     /** @var bool */
     protected $overwrite;
 
-    public function __construct($name, $content = '', $overwrite = false)
+    public function __construct($path, $content = '', $overwrite = false)
     {
-        $this->name = $name;
+        if (!($path instanceof Path)) {
+            $path = Path::parse($path);
+        }
+
+        $this->path = $path;
         $this->content = $content;
         $this->overwrite = $overwrite;
+    }
+
+    public static function create($path, $content = '', $overwrite = false)
+    {
+        return new self($path, $content, $overwrite);
     }
 
     /** @return string */
@@ -24,10 +33,10 @@ class File
         return $this->content;
     }
 
-    /** @return string */
-    public function getName()
+    /** @return Path */
+    public function getPath()
     {
-        return $this->name;
+        return $this->path;
     }
 
     /** @return boolean */
