@@ -26,7 +26,12 @@ bin/dev-tools gen:gi symfony,phpstorm
 ## Generate virtual host
 
 ```bash
-bin/dev-tools gen:vhost dev-tools.lo /home/dev/dev-tools/src --alias=dev-tools.dev --alias=tools.dev --custom-logs
+bin/dev-tools gen:vhost 
+	dev-tools.lo
+	/home/dev/dev-tools/src
+	--alias=dev-tools.dev
+	--alias=tools.dev
+	--custom-logs
 ```
 
 Will output:
