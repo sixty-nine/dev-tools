@@ -16,6 +16,8 @@ class App extends Application
             new Command\GenerateProjectCommand(),
             new Command\GitIgnoreListCommand(),
             new Command\GitIgnoreGetCommand(),
+            new Command\LicensesListCommand(),
+            new Command\LicensesGetCommand(),
         );
 
         $this->addCommands($commands);
