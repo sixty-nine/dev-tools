@@ -53,3 +53,17 @@ Will output:
 
 </VirtualHost>
 ```
+
+## Generate OSS licenses
+
+Get the list of available licenses:
+
+```
+bin/dev-tools gen:licenses:list
+```
+
+Get the text of a license:
+
+```
+bin/dev-tools gen:licenses mit
+```
