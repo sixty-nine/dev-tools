@@ -13,6 +13,7 @@ class PathResolver
 
     /**
      * @param string $pathPrefix
+     * @param string $basePath
      */
     function __construct($pathPrefix = '', $basePath = '')
     {

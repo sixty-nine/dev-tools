@@ -3,7 +3,6 @@
 namespace SixtyNine\DevTools\Tests;
 
 use League\Flysystem\Adapter\Local;
-use League\Flysystem\Adapter\NullAdapter;
 use League\Flysystem\Filesystem;
 use PHPUnit\Framework\TestCase;
 use SixtyNine\DevTools\Builder;

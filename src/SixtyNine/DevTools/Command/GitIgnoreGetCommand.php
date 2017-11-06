@@ -3,13 +3,10 @@
 namespace SixtyNine\DevTools\Command;
 
 use SixtyNine\DevTools\Builder\GitIgnoreBuilder;
-use SixtyNine\DevTools\Builder\VirtualHostBuilder;
-use SixtyNine\DevTools\Model\VirtualHost;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputOption;
 
 class GitIgnoreGetCommand extends Command
 {
