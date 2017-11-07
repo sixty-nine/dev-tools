@@ -14,6 +14,10 @@ class VirtualHostBuilderTest extends TestCase
         $builder = new VirtualHostBuilder($host);
         $this->assertEquals('*:80', $builder->getAddressesString());
 
+        $host = new VirtualHost('server', 'root', false, [],  [80 => 'domain.tld']);
+        $builder = new VirtualHostBuilder($host);
+        $this->assertEquals('domain.tld:80', $builder->getAddressesString());
+
         $host = new VirtualHost('server', 'root', false, [],  [80 => 'domain.tld', 8080 => 'domain2.tld2']);
         $builder = new VirtualHostBuilder($host);
         $this->assertEquals('domain.tld:80 domain2.tld2:8080', $builder->getAddressesString());
