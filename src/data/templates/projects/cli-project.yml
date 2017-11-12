@@ -1,0 +1,26 @@
+template:
+    vendor:
+        name: "{{vendor.name}}"
+        email: "{{vendor.email}}"
+        namespace: "{{vendor.namespace}}"
+    project:
+        name: "CLI Project"
+        license: "{{project.license}}"
+        directories:
+            - "{{basePath}}/src"
+            - "{{basePath}}/src/{{vendor.namespace}}/{{project.name}}
+            - "{{basePath}}/src/tests"
+        execute:
+            - "run cd {{basePath}}"
+            - "run composer update"
+            - "run git init"
+            - "generate-license {{vendor.license}}"
+            - "generate-gitignore sublimetext,phpstorm"
+            - "copy-template {{templatesPath}}/files/composer-test-bootstrap.php.yml {{basePath}}/src/tests/bootstrap.php"
+            - "copy-template {{templatesPath}}/files/phpunit.xml.yml {{basePath}}/src/tests/phpunit.xml.dist"
+            - "copy-template {{templatesPath}}/files/editorconfig.yml {{basePath}}/src/.editorconfig"
+
+            {% if git-remote-url %}
+            - "run git remote add origin {{gitRemoteUrl}}"
+            - "run push -u origin master"
+            {% endif %}

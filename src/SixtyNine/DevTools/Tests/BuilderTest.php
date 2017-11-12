@@ -6,9 +6,13 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use PHPUnit\Framework\TestCase;
 use SixtyNine\DevTools\Builder;
+use SixtyNine\DevTools\ConsoleIO;
+use SixtyNine\DevTools\Environment;
 use SixtyNine\DevTools\Model\File;
+use SixtyNine\DevTools\Model\Metadata;
 use SixtyNine\DevTools\Model\Path;
 use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Input\StringInput;
 
 class BuilderTest extends TestCase
 {
@@ -16,6 +20,8 @@ class BuilderTest extends TestCase
     protected $fs;
     /** @var Builder */
     protected $builder;
+    /** @var Environment */
+    protected $env;
     /** @var string */
     protected $testPath;
 
@@ -32,7 +38,9 @@ class BuilderTest extends TestCase
             ]
         ]);
         $this->fs->createDir($this->testPath);
-        $this->builder = new Builder('/', $adapter, new NullOutput(), false);
+
+        $this->env = new Environment('/', $adapter, new ConsoleIO(new StringInput(''), new NullOutput()), new Metadata(), false);
+        $this->builder = new Builder($this->env);
     }
 
     public function tearDown()

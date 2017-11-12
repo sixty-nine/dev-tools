@@ -21,8 +21,11 @@ class PathResolver
         $this->basePath = $this->normalize($basePath);
     }
 
-    public function resolve(Path $path, $usePrefix = true)
+    public function resolve($path, $usePrefix = true)
     {
+        if (!($path instanceof Path)) {
+            $path = Path::parse($path);
+        }
         $normalized = $this->normalize($path->getPath());
 
         $fullPath = '';

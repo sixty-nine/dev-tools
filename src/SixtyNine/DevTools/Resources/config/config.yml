@@ -1,0 +1,40 @@
+parameters:
+
+    project_dir: /home/dev
+
+services:
+
+    environment:
+        class: SixtyNine\DevTools\Environment
+
+    output_formatter:
+        class: Symfony\Component\Console\Formatter\OutputFormatter
+        arguments:
+            - true
+        calls:
+            - method: setStyle
+              arguments: ['title', '@title_style']
+            - method: setStyle
+              arguments: ['info', '@info_style']
+            - method: setStyle
+              arguments: ['error', '@error_style']
+            - method: setStyle
+              arguments: ['shell', '@shell_style']
+            - method: setStyle
+              arguments: ['code', '@code_style']
+
+    title_style:
+        class: Symfony\Component\Console\Formatter\OutputFormatterStyle
+        arguments: ['yellow', 'black', ['bold', 'underscore']]
+    info_style:
+        class: Symfony\Component\Console\Formatter\OutputFormatterStyle
+        arguments: ['white', 'black', ['bold']]
+    error_style:
+        class: Symfony\Component\Console\Formatter\OutputFormatterStyle
+        arguments: ['red', 'black', ['bold']]
+    shell_style:
+        class: Symfony\Component\Console\Formatter\OutputFormatterStyle
+        arguments: ['cyan', 'black']
+    code_style:
+        class: Symfony\Component\Console\Formatter\OutputFormatterStyle
+        arguments: ['blue', 'default']
