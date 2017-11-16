@@ -1,0 +1,32 @@
+sourcePath = src
+testsPath = $(sourcePath)/tests
+vendorPath = $(sourcePath)/vendor
+artefactsPath = artefacts
+
+phpunit = $(vendorPath)/bin/phpunit
+phpdoc = $(vendorPath)/bin/phpdoc
+
+tests:
+	$(phpunit) -c $(testsPath)
+
+coverage:
+	rm -rf $(artefactsPath)/coverage; \
+	mkdir -p $(artefactsPath)/coverage; \
+	php -d xdebug.profiler_enable=on $(phpunit) -c $(testsPath) --coverage-html $(artefactsPath)/coverage; \
+	echo "\nCode coverage generated in $(artefactsPath)/coverage\n"
+
+doc:
+	rm -rf $(artefactsPath)/doc; \
+	mkdir -p $(artefactsPath)/doc; \
+	$(phpdoc) run --template=responsive-twig -t $(artefactsPath)/doc -d $(sourcePath)/src; \
+	echo "\nDocumentation generated in $(artefactsPath)/doc\n"
+
+setup:
+	/bin/bash -c '[[ ! -f "$(phpdoc)" ]] && wget http://www.phpdoc.org/phpDocumentor.phar -O $(phpdoc) && chmod +x $(phpdoc)' 2>/dev/null; \
+	echo "\nDone\n"
+
+enable-xdebug:
+	sudo phpenmod -s cli xdebug
+
+disable-xdebug:
+	sudo phpdismod -s cli xdebug

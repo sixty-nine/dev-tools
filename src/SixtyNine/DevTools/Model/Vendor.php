@@ -23,7 +23,7 @@ class Vendor
      * @param string $name
      * @param string $namespace
      */
-    public function __construct($email = '', $name = '', $namespace = '')
+    public function __construct($name = '', $email = '', $namespace = '')
     {
         $this->email = $email;
         $this->name = $name;

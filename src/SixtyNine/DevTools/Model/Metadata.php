@@ -54,4 +54,16 @@ class Metadata
             'project' => $this->getProject(),
         ];
     }
+
+    public static function fromComposerJson($file)
+    {
+        if (!file_exists($file)) {
+            throw new \InvalidArgumentException("File not found: $file");
+        }
+        $data = json_decode(file_get_contents($file), true);
+        return new self(
+            new Project(basename($data['name']), array_key_exists('license', $data) ? $data['license'] : ''),
+            new Vendor(dirname($data['name']))
+        );
+    }
 }

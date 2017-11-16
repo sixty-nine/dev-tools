@@ -29,6 +29,8 @@ class Environment
     protected $fs;
     /** @var \SixtyNine\DevTools\ConsoleIO */
     protected $io;
+    /** @var string */
+    protected $workingDir;
 
     function __construct($basePath, AdapterInterface $adapter, ConsoleIO $io, Metadata $metadata = null, $dryRun = true)
     {
@@ -139,5 +141,22 @@ class Environment
     {
         $this->metadata = $metadata;
         return $this;
+    }
+
+    public function getCwd()
+    {
+        return $this->workingDir;
+    }
+
+    public function cd($dir)
+    {
+        $newDir = $this->workingDir . $dir;
+        if (!is_dir($newDir)) {
+            throw new \InvalidArgumentException('Invalid directory: ' . $newDir);
+        }
+
+        // TODO: check we don't exit the base dir
+
+        $this->workingDir = $newDir;
     }
 }

@@ -34,4 +34,13 @@ abstract class Task
     }
 
     public function execute() { }
+
+    public static function create($className, ...$args)
+    {
+        $task = new $className(...$args);
+        if (!is_subclass_of($task, self::class)) {
+            throw new \InvalidArgumentException('Invalid class: ' . $className);
+        }
+        return $task;
+    }
 }

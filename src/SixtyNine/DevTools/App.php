@@ -19,6 +19,7 @@ class App extends Application
         $commands = array(
             new Command\GenerateVHostCommand(),
             new Command\GenerateProjectCommand(),
+            new Command\CloneProjectCommand(),
             new Command\GitIgnoreListCommand(),
             new Command\GitIgnoreGetCommand(),
             new Command\LicensesListCommand(),

@@ -7,6 +7,9 @@ services:
     environment:
         class: SixtyNine\DevTools\Environment
 
+    local_adapter_builder:
+        class: SixtyNine\DevTools\Builder\LocalAdapterBuilder
+
     output_formatter:
         class: Symfony\Component\Console\Formatter\OutputFormatter
         arguments:

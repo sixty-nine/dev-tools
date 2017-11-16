@@ -22,13 +22,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class GenerateProjectCommand extends ContainerAwareCommand
+class CloneProjectCommand extends ContainerAwareCommand
 {
     /** {@inheritdoc} */
     protected function configure() {
         $this
-            ->setName('gen:project')
-            ->setDescription('Generate project')
+            ->setName('gen:project:checkout')
+            ->setDescription('Checkout a project form github')
+            ->addArgument('url', InputArgument::REQUIRED, 'Checkout URL')
             ->addOption('force', null, InputOption::VALUE_NONE, 'If this is not set, run in dry-mode')
         ;
     }
@@ -40,47 +41,25 @@ class GenerateProjectCommand extends ContainerAwareCommand
         $output->setFormatter($formatter);
 
         $basePath = realpath(__DIR__ . '/../../../../../files');
-        $hostBuilder = new VirtualHostBuilder(new VirtualHost('test.lo', $basePath));
 
         /** @var \SixtyNine\DevTools\Builder\LocalAdapterBuilder $localAdapterBuilder */
         $localAdapterBuilder = $this->container->get('local_adapter_builder');
         $adapter = $localAdapterBuilder->createLocalAdapter($basePath);
 
-        $metadata = new Metadata(
-            Project::create()
-                ->setName('Dev-Tools')
-                ->setLicense('MIT')
-            ,
-            Vendor::create()
-                ->setName('Sixty-Nine')
-                ->setEmail('hello@sixty-nine.ch')
-                ->setNamespace('SixtyNine')
-        );
+        $metadata = new Metadata();
 
-        $cmd = sprintf(
-            'composer init --name="%s/%s" --description="description" ' .
-            '--require="symfony/console:3.*" --require="symfony/process:3.*" ' .
-            '--require-dev="phpunit/phpunit ^6.4" -n',
-            strtolower($metadata->getVendor()->getNamespace()),
-            strtolower($metadata->getProject()->getName())
-        );
         $env = new Environment($basePath, $adapter, new ConsoleIO($input, $output), $metadata, !$input->getOption('force'));
         $builder = new Builder($env);
         $builder
-            ->createDirectory(Path::parse('/src'))
-            ->createDirectory(Path::parse('/src/tests'))
             ->createDirectory(Path::parse('/artefacts/doc'))
             ->createDirectory(Path::parse('/artefacts/coverage'))
-            ->createFile(File::create('/etc/v-host', $hostBuilder->build(), true))
-            ->renderTemplate('files/composer-test-bootstrap.php.twig', Path::parse('/src/tests/bootstrap.php'))
-            ->renderTemplate('files/phpunit.xml.twig', Path::parse('/src/tests/phpunit.xml.dist'))
+            ->gitCheckout(Path::parse('/'), 'git@github.com:sixty-nine/dev-tools.git', 'src')
             ->renderTemplate('files/Makefile.twig', Path::parse('/Makefile'))
         ;
 
-        $path = $env->getResolver()->resolve('/src', true);;
-        $builder
-            ->runProcess($path, $cmd)
-            ->composerInstall(Path::parse('/src'))
-        ;
+        $composerJson = $env->getResolver()->resolve('/src/composer.json', false);
+        if ($env->getFs()->has($composerJson)) {
+            $builder->composerInstall(Path::parse(dirname($composerJson)));
+        }
     }
 }

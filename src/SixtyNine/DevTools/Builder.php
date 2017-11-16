@@ -13,6 +13,7 @@ use SixtyNine\DevTools\Tasks\GitCheckout;
 use SixtyNine\DevTools\Tasks\MakeWritable;
 use SixtyNine\DevTools\Tasks\RenderTemplate;
 use SixtyNine\DevTools\Tasks\RunProcess;
+use SixtyNine\DevTools\Tasks\Task;
 
 class Builder
 {
@@ -25,6 +26,7 @@ class Builder
     public function __construct(Environment $env)
     {
         $this->env = $env;
+        $this->workingDir = $env->getBasePath();
 
         if ($this->env->isDryRun()) {
             $this->env->getIo()->writeln('<question>Running in dry mode</question>');
@@ -91,9 +93,9 @@ class Builder
      * @param string $url
      * @return $this
      */
-    public function gitCheckout(Path $path, $url)
+    public function gitCheckout(Path $path, $url, $checkoutName = '')
     {
-        $task = new GitCheckout($this->env, $path, $url);
+        $task = new GitCheckout($this->env, $path, $url, $checkoutName);
         $task->execute();
         return $this;
     }
@@ -122,7 +124,29 @@ class Builder
         return $this;
     }
 
-    protected function runProcess($path, $cmd)
+    /**
+     * @param string $dir
+     */
+    public function cd($dir)
+    {
+        $this->env->cd($dir);
+    }
+
+    /**
+     * @param Task|array[Task] $tasks
+     * @return $this
+     */
+    public function executeTasks($tasks)
+    {
+        $tasks = is_array($tasks) ? $tasks : [$tasks];
+        /** @var Task $task */
+        foreach ($tasks as $task) {
+            $task->execute();
+        }
+        return $this;
+    }
+
+    public function runProcess($path, $cmd)
     {
         $task = new RunProcess($this->env, Path::create($path), $cmd);
         $task->execute();
