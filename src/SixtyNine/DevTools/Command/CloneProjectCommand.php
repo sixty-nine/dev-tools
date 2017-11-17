@@ -2,19 +2,12 @@
 
 namespace SixtyNine\DevTools\Command;
 
-use League\Flysystem\Adapter\Local;
-use SixtyNine\DevTools\Builder\VirtualHostBuilder;
 use SixtyNine\DevTools\Builder;
 use SixtyNine\DevTools\ConsoleIO;
 use SixtyNine\DevTools\Environment;
-use SixtyNine\DevTools\Model\File;
 use SixtyNine\DevTools\Model\Metadata;
 use SixtyNine\DevTools\Model\Path;
 use SixtyNine\DevTools\Model\Project;
-use SixtyNine\DevTools\Model\Vendor;
-use SixtyNine\DevTools\Model\VirtualHost;
-use SixtyNine\DevTools\Tasks\CreateFile;
-use SixtyNine\DevTools\Tasks\Task;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -46,9 +39,7 @@ class CloneProjectCommand extends ContainerAwareCommand
         $localAdapterBuilder = $this->container->get('local_adapter_builder');
         $adapter = $localAdapterBuilder->createLocalAdapter($basePath);
 
-        $metadata = new Metadata();
-
-        $env = new Environment($basePath, $adapter, new ConsoleIO($input, $output), $metadata, !$input->getOption('force'));
+        $env = new Environment($basePath, $adapter, new ConsoleIO($input, $output), new Project(), !$input->getOption('force'));
         $builder = new Builder($env);
         $builder
             ->createDirectory(Path::parse('/artefacts/doc'))
@@ -59,6 +50,8 @@ class CloneProjectCommand extends ContainerAwareCommand
 
         $composerJson = $env->getResolver()->resolve('/src/composer.json', false);
         if ($env->getFs()->has($composerJson)) {
+            $project = Project::fromComposerJson($env->getResolver()->resolve('/src/composer.json', true));
+            $env->setProject($project);
             $builder->composerInstall(Path::parse(dirname($composerJson)));
         }
     }

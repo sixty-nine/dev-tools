@@ -7,3 +7,4 @@ if (!file_exists($autoload)) {
 }
 
 require_once $autoload;
+require_once __DIR__ . '/../src/SixtyNine/DevTools/functions.php';

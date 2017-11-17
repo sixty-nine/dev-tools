@@ -2,13 +2,13 @@ template:
     vendor:
         name: "{{vendor.name}}"
         email: "{{vendor.email}}"
-        namespace: "{{vendor.namespace}}"
+        namespace: "{{project.namespace}}"
     project:
         name: "CLI Project"
         license: "{{project.license}}"
         directories:
             - "{{basePath}}/src"
-            - "{{basePath}}/src/{{vendor.namespace}}/{{project.name}}
+            - "{{basePath}}/src/{{project.namespace}}/{{project.name}}
             - "{{basePath}}/src/tests"
         execute:
             - "run cd {{basePath}}"

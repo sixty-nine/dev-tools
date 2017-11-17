@@ -2,7 +2,7 @@
 
 namespace SixtyNine\DevTools\Command;
 
-use League\Flysystem\Adapter\Local;
+
 use SixtyNine\DevTools\Builder\VirtualHostBuilder;
 use SixtyNine\DevTools\Builder;
 use SixtyNine\DevTools\ConsoleIO;
@@ -11,10 +11,8 @@ use SixtyNine\DevTools\Model\File;
 use SixtyNine\DevTools\Model\Metadata;
 use SixtyNine\DevTools\Model\Path;
 use SixtyNine\DevTools\Model\Project;
-use SixtyNine\DevTools\Model\Vendor;
+use SixtyNine\DevTools\Model\Author;
 use SixtyNine\DevTools\Model\VirtualHost;
-use SixtyNine\DevTools\Tasks\CreateFile;
-use SixtyNine\DevTools\Tasks\Task;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,6 +27,9 @@ class GenerateProjectCommand extends ContainerAwareCommand
         $this
             ->setName('gen:project')
             ->setDescription('Generate project')
+            ->addArgument('project', InputArgument::OPTIONAL, 'The name of the project')
+            ->addArgument('vendor', InputArgument::OPTIONAL, 'The name of the vendor')
+            ->addOption('license', null, InputOption::VALUE_OPTIONAL, 'If this is not set, run in dry-mode')
             ->addOption('force', null, InputOption::VALUE_NONE, 'If this is not set, run in dry-mode')
         ;
     }
@@ -36,35 +37,49 @@ class GenerateProjectCommand extends ContainerAwareCommand
     /** {@inheritdoc} */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $name = $input->getArgument('project');
+        $license = $input->getOption('license');
+
+        $io = new ConsoleIO($input, $output);
+
+        $io->section('Questions');
+        if (!$name) {
+            $name = $io->ask('The name of the project', 'vendor/project', function ($value) {
+                if (!Project::isValidName($value)) {
+                    throw new \InvalidArgumentException('Invalid project name');
+                }
+                return $value;
+            });
+        }
+
+        if (!$license || !Project::isValidLicense($license)) {
+            if ($io->confirm('Do you want to select a license?', true)) {
+                $license = $io->choice('The license type of the project', array_map('strtoupper', Project::getValidLicenses()), 'MIT');
+            }
+        }
+
         $formatter = $this->container->get('output_formatter');
         $output->setFormatter($formatter);
 
         $basePath = realpath(__DIR__ . '/../../../../../files');
-        $hostBuilder = new VirtualHostBuilder(new VirtualHost('test.lo', $basePath));
+        $hostBuilder = new VirtualHostBuilder(new VirtualHost(basename($name) . '.dev', $basePath));
 
         /** @var \SixtyNine\DevTools\Builder\LocalAdapterBuilder $localAdapterBuilder */
         $localAdapterBuilder = $this->container->get('local_adapter_builder');
         $adapter = $localAdapterBuilder->createLocalAdapter($basePath);
 
-        $metadata = new Metadata(
-            Project::create()
-                ->setName('Dev-Tools')
-                ->setLicense('MIT')
-            ,
-            Vendor::create()
-                ->setName('Sixty-Nine')
-                ->setEmail('hello@sixty-nine.ch')
-                ->setNamespace('SixtyNine')
-        );
+        $project = Project::create()
+            ->setName($name)
+            ->setLicense($license)
+        ;
 
         $cmd = sprintf(
-            'composer init --name="%s/%s" --description="description" ' .
+            'composer init --name="%s" --description="description" ' .
             '--require="symfony/console:3.*" --require="symfony/process:3.*" ' .
             '--require-dev="phpunit/phpunit ^6.4" -n',
-            strtolower($metadata->getVendor()->getNamespace()),
-            strtolower($metadata->getProject()->getName())
+            strtolower($project->getName())
         );
-        $env = new Environment($basePath, $adapter, new ConsoleIO($input, $output), $metadata, !$input->getOption('force'));
+        $env = new Environment($basePath, $adapter, $io, $project, !$input->getOption('force'));
         $builder = new Builder($env);
         $builder
             ->createDirectory(Path::parse('/src'))

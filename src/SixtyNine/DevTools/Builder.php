@@ -5,7 +5,7 @@ namespace SixtyNine\DevTools;
 use SixtyNine\DevTools\Model\File;
 use SixtyNine\DevTools\Model\Path;
 use SixtyNine\DevTools\Model\Project;
-use SixtyNine\DevTools\Model\Vendor;
+use SixtyNine\DevTools\Model\Author;
 use SixtyNine\DevTools\Tasks\ComposerInstall;
 use SixtyNine\DevTools\Tasks\CreateDir;
 use SixtyNine\DevTools\Tasks\CreateFile;
@@ -36,10 +36,10 @@ class Builder
     }
 
     /**
-     * @param Vendor $vendor
+     * @param Author $vendor
      * @return $this
      */
-    public function setVendor(Vendor $vendor)
+    public function setVendor(Author $vendor)
     {
         $this->env->getMetadata()->setVendor($vendor);
         return $this;

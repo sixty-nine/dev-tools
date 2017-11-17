@@ -20,7 +20,7 @@ class Engine
     public function render($templateFile, $params = array())
     {
         $arguments = array_merge($this->getTemplatesParameters(), $params);
-        $arguments = array_merge($this->env->getMetadata()->toArray(), $arguments);
+        $arguments = array_merge($this->env->getProject()->toArray(), $arguments);
         $template = $this->twig->loadTemplate($templateFile);
         return $template->render($arguments);
     }

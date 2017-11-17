@@ -6,6 +6,7 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Filesystem as BaseFileSystem;
 use SixtyNine\DevTools\Model\Metadata;
+use SixtyNine\DevTools\Model\Project;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -21,8 +22,8 @@ class Environment
     protected $templatesPath;
     /** @var string */
     protected $pathPrefix = '';
-    /** @var Metadata */
-    protected $metadata;
+    /** @var Project */
+    protected $project;
     /** @var \SixtyNine\DevTools\PathResolver */
     protected $resolver;
     /** @var \League\Flysystem\FilesystemInterface */
@@ -32,7 +33,7 @@ class Environment
     /** @var string */
     protected $workingDir;
 
-    function __construct($basePath, AdapterInterface $adapter, ConsoleIO $io, Metadata $metadata = null, $dryRun = true)
+    function __construct($basePath, AdapterInterface $adapter, ConsoleIO $io, Project $project = null, $dryRun = true)
     {
         if ($adapter instanceof Local) {
             $this->pathPrefix = $adapter->getPathPrefix();
@@ -44,7 +45,7 @@ class Environment
 
         $this->fs = new BaseFileSystem($adapter);
         $this->resolver = new PathResolver($this->pathPrefix, $basePath);
-        $this->metadata = $metadata ?: new Metadata();
+        $this->project = $project ?: new Project();
         $this->io = $io;
         $this->dryRun = $dryRun;
     }
@@ -67,10 +68,10 @@ class Environment
         return $this->templatesPath;
     }
 
-    /** @return \SixtyNine\DevTools\Model\Metadata */
-    public function getMetadata()
+    /** @return \SixtyNine\DevTools\Model\Project */
+    public function getProject()
     {
-        return $this->metadata;
+        return $this->project;
     }
 
     /** @return \League\Flysystem\FilesystemInterface */
@@ -134,12 +135,12 @@ class Environment
     }
 
     /**
-     * @param \SixtyNine\DevTools\Model\Metadata $metadata
+     * @param \SixtyNine\DevTools\Model\Project $project
      * @return Environment
      */
-    public function setMetadata($metadata)
+    public function setProject($project)
     {
-        $this->metadata = $metadata;
+        $this->project = $project;
         return $this;
     }
 

@@ -9,7 +9,7 @@ use SixtyNine\DevTools\Builder;
 use SixtyNine\DevTools\ConsoleIO;
 use SixtyNine\DevTools\Environment;
 use SixtyNine\DevTools\Model\File;
-use SixtyNine\DevTools\Model\Metadata;
+use SixtyNine\DevTools\Model\Project;
 use SixtyNine\DevTools\Model\Path;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Input\StringInput;
@@ -39,7 +39,7 @@ class BuilderTest extends TestCase
         ]);
         $this->fs->createDir($this->testPath);
 
-        $this->env = new Environment('/', $adapter, new ConsoleIO(new StringInput(''), new NullOutput()), new Metadata(), false);
+        $this->env = new Environment('/', $adapter, new ConsoleIO(new StringInput(''), new NullOutput()), new Project(), false);
         $this->builder = new Builder($this->env);
     }
 

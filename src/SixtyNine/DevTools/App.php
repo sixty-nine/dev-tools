@@ -7,6 +7,8 @@ use SixtyNine\DevTools\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Console\Application;
 use SixtyNine\DevTools\Command;
 
+require __DIR__ . '/functions.php';
+
 class App extends Application
 {
     public function __construct() {
